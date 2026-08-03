@@ -84,6 +84,14 @@ function getAuditLog(token) {
   return readAll_('AUDIT_LOG').slice().reverse().slice(0, 500);
 }
 
+function listUsers(token) {
+  return listUsers_(requireUser_(token, [ROLES.ADMIN]));
+}
+
+function saveUser(token, input) {
+  return saveUser_(input, requireUser_(token, [ROLES.ADMIN]));
+}
+
 function publicProgram_(record) {
   return {id: record.id, name: record.name, category: record.category, description: record.description, target: record.target, startDate: record.start_date, endDate: record.end_date, affiliated: record.affiliated === 'TRUE', affiliationLabel: record.affiliated === 'TRUE' ? APP.AFFILIATION_LABEL : ''};
 }
