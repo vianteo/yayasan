@@ -16,14 +16,14 @@ Web app baru menggunakan Google Apps Script V8, HTML Service, Google Sheets, Goo
 - Wakil Ketua: pemantauan dan delegasi resmi.
 - Sekretaris: program, kegiatan, peserta, penerima manfaat, konten.
 - Bendahara: donatur, donasi, pengeluaran, penyaluran, bukti.
-- Admin: pengguna, peran, master data, dan pengaturan.
+- Admin: pengguna, peran, master data, dan pengaturan. Modul `Kelola Pengguna` hanya tampil untuk Admin dan menyediakan tambah, ubah, aktivasi, serta nonaktivasi tanpa hapus permanen.
 - Publik: data yang telah diterbitkan saja.
 
 Semua otorisasi diperiksa di server. Login internal menggunakan kode sekali pakai ke alamat Gmail yang terdapat pada allowlist `USERS`.
 
 ## 4. Workflows and prioritized features
 
-V1 mencakup program/kegiatan, peserta, penerima manfaat, donasi uang/barang, pengeluaran/penyaluran, persetujuan, publikasi, laporan, audit, dan backup. Semua pengeluaran disetujui ketua; transaksi besar/tidak biasa diperiksa pengawas. Publikasi dibuat sekretaris dan disetujui ketua.
+V1 mencakup program/kegiatan, peserta, penerima manfaat, donasi uang/barang, pengeluaran/penyaluran, persetujuan, publikasi, laporan, audit, backup, dan pengelolaan akses pengguna oleh Admin. Semua pengeluaran disetujui ketua; transaksi besar/tidak biasa diperiksa pengawas. Publikasi dibuat sekretaris dan disetujui ketua.
 
 ## 5. Entity/data model and selected store
 
@@ -35,7 +35,7 @@ Sheets, Drive, Mail, backup terjadwal, ringkasan bulanan, dan pengingat persetuj
 
 ## 7. UI and accessibility
 
-Portal publik: beranda, profil, struktur, program, berita, galeri, laporan ringkas, donasi, kontak. Portal internal: dashboard dan modul administrasi. Bahasa Indonesia, responsif, ramah keyboard, berlabel, dan memiliki status loading/kosong/gagal/berhasil.
+Portal publik: beranda, profil, struktur, program, berita, galeri, laporan ringkas, donasi, kontak. Portal internal: dashboard dan modul administrasi, termasuk menu `Kelola Pengguna` khusus Admin. Bahasa Indonesia, responsif, ramah keyboard, berlabel, dan memiliki status loading/kosong/gagal/berhasil.
 
 ## 8. OAuth scopes and advanced services
 
@@ -51,10 +51,12 @@ Risiko utama: kuota email/eksekusi, konkurensi Sheets, kepemilikan akun, kebocor
 
 ## 11. Testable acceptance criteria
 
-Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; mencatat seluruh keputusan; mewajibkan pengawas untuk transaksi khusus; menjaga data pribadi dari portal publik; menangani kegagalan Mail/Drive tanpa menandai proses selesai; dan mendukung pemulihan backup.
+Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; mencatat seluruh keputusan; mewajibkan pengawas untuk transaksi khusus; menjaga data pribadi dari portal publik; menangani kegagalan Mail/Drive tanpa menandai proses selesai; dan mendukung pemulihan backup. Pengelolaan pengguna harus menolak email duplikat, peran/status yang tidak valid, upaya Admin menonaktifkan atau menurunkan perannya sendiri, serta perubahan yang menyebabkan tidak ada Admin aktif. Setiap perubahan pengguna dicatat pada Audit Log.
 
 ## 12. Manual setup and out-of-scope items
 
-Manual: akun pemilik, Sheets/folder Drive, allowlist pengguna, batas transaksi, rekening/kontak resmi, Script Properties, OAuth, branding, dan penyesuaian AD/ART. Di luar V1: payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/karyawan, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
+Manual: akun pemilik, Sheets/folder Drive, pengguna Admin pertama, batas transaksi, rekening/kontak resmi, Script Properties, OAuth, branding, dan penyesuaian AD/ART. Pengguna berikutnya dikelola melalui portal oleh Admin. Di luar V1: payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/karyawan, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
 
 Disetujui oleh pengguna pada 3 Agustus 2026.
+
+Perubahan modul pengelolaan pengguna disetujui oleh pengguna pada 3 Agustus 2026.

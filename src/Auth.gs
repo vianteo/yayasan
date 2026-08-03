@@ -96,3 +96,107 @@ function hashText_(text) {
 function safeUser_(user) {
   return {id: user.id, email: user.email, name: user.name, role: user.role};
 }
+
+function listUsers_(actor) {
+  if (actor.role !== ROLES.ADMIN) throw new Error('Anda tidak memiliki izin untuk tindakan ini.');
+  return readAll_('USERS').map(safeManagedUser_).sort(function (a, b) {
+    return String(a.name || a.email).localeCompare(String(b.name || b.email), 'id');
+  });
+}
+
+function saveUser_(input, actor) {
+  if (actor.role !== ROLES.ADMIN) throw new Error('Anda tidak memiliki izin untuk tindakan ini.');
+  const clean = validateManagedUserInput_(input || {});
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  let saved;
+  let action;
+  try {
+    const sheet = getSheet_('USERS');
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(String);
+    const records = values.slice(1).filter(function (row) {
+      return row.some(function (value) { return value !== ''; });
+    }).map(function (row) {
+      return headers.reduce(function (record, header, index) {
+        record[header] = row[index];
+        return record;
+      }, {});
+    });
+    const existing = clean.id ? records.find(function (record) {
+      return String(record.id) === clean.id;
+    }) : null;
+    if (clean.id && !existing) throw new Error('Pengguna tidak ditemukan. Muat ulang halaman dan coba lagi.');
+    const duplicate = records.find(function (record) {
+      return normalizeEmail_(record.email) === clean.email && String(record.id) !== clean.id;
+    });
+    if (duplicate) throw new Error('Email sudah terdaftar pada pengguna lain.');
+
+    const editingSelf = existing && normalizeEmail_(existing.email) === normalizeEmail_(actor.email);
+    if (editingSelf && (clean.role !== ROLES.ADMIN || clean.active !== 'TRUE')) {
+      throw new Error('Super Admin tidak dapat menurunkan peran atau menonaktifkan akunnya sendiri.');
+    }
+    if (existing && String(existing.role) === ROLES.ADMIN && String(existing.active).toUpperCase() === 'TRUE' &&
+        (clean.role !== ROLES.ADMIN || clean.active !== 'TRUE')) {
+      const otherActiveAdmins = records.filter(function (record) {
+        return String(record.id) !== clean.id && String(record.role) === ROLES.ADMIN && String(record.active).toUpperCase() === 'TRUE';
+      });
+      if (!otherActiveAdmins.length) throw new Error('Minimal satu Super Admin harus tetap aktif.');
+    }
+
+    const now = nowIso_();
+    saved = {
+      id: existing ? String(existing.id) : newId_('USR'),
+      email: clean.email,
+      name: clean.name,
+      role: clean.role,
+      active: clean.active,
+      created_at: existing ? existing.created_at : now,
+      updated_at: now,
+    };
+    const row = headers.map(function (header) {
+      return Object.prototype.hasOwnProperty.call(saved, header) ? saved[header] : '';
+    });
+    if (existing) {
+      const idIndex = headers.indexOf('id');
+      const rowIndex = values.findIndex(function (value, index) {
+        return index > 0 && String(value[idIndex]) === clean.id;
+      });
+      sheet.getRange(rowIndex + 1, 1, 1, headers.length).setValues([row]);
+      action = 'UPDATE';
+    } else {
+      sheet.appendRow(row);
+      action = 'CREATE';
+    }
+  } finally {
+    lock.releaseLock();
+  }
+  addAudit_('users', saved.id, action, actor, {email: saved.email, role: saved.role, active: saved.active});
+  return safeManagedUser_(saved);
+}
+
+function validateManagedUserInput_(input) {
+  const id = String(input.id || '').trim();
+  const email = normalizeEmail_(input.email);
+  const name = String(input.name || '').trim();
+  const role = String(input.role || '').trim().toUpperCase();
+  const active = String(input.active || '').trim().toUpperCase();
+  if (!name) throw new Error('Nama pengguna wajib diisi.');
+  if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('Format email tidak valid.');
+  if (/^[=+\-@]/.test(name) || /^[=+\-@]/.test(email)) throw new Error('Nama atau email mengandung karakter awal yang tidak diizinkan.');
+  if (Object.keys(ROLES).map(function (key) { return ROLES[key]; }).indexOf(role) < 0) throw new Error('Peran pengguna tidak valid.');
+  if (['TRUE', 'FALSE'].indexOf(active) < 0) throw new Error('Status pengguna tidak valid.');
+  return {id: id, email: email, name: name, role: role, active: active};
+}
+
+function safeManagedUser_(user) {
+  return {
+    id: String(user.id || ''),
+    email: normalizeEmail_(user.email),
+    name: String(user.name || ''),
+    role: String(user.role || ''),
+    active: String(user.active || '').toUpperCase(),
+    created_at: String(user.created_at || ''),
+    updated_at: String(user.updated_at || ''),
+  };
+}
