@@ -1,0 +1,49 @@
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yayasan-bina-tali-kasih-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Require deployment secrets
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          CLASP_JSON: ${{ secrets.CLASP_JSON }}
+        run: |
+          test -n "$CLASPRC_JSON" || { echo 'CLASPRC_JSON is missing'; exit 1; }
+          test -n "$CLASP_JSON" || { echo 'CLASP_JSON is missing'; exit 1; }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run ci
+      - name: Restore clasp credentials
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          CLASP_JSON: ${{ secrets.CLASP_JSON }}
+        run: |
+          umask 077
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          printf '%s' "$CLASP_JSON" > .clasp.json
+      - name: Deploy stable web app
+        run: npm run deploy | tee deploy-result.json
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo '## Apps Script deployment' >> "$GITHUB_STEP_SUMMARY"
+          if test -f deploy-result.json; then cat deploy-result.json >> "$GITHUB_STEP_SUMMARY"; else echo 'Deployment did not produce a result.' >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Remove credentials
+        if: always()
+        run: rm -f -- .clasp.json "$HOME/.clasprc.json"

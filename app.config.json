@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "name": "Yayasan Bina Tali Kasih",
+  "projectType": "webapp",
+  "dataStore": "sheets",
+  "deploymentMode": "versioned",
+  "requiredScriptProperties": [
+    "PRIMARY_SPREADSHEET_ID",
+    "DOCUMENTS_DRIVE_FOLDER_ID",
+    "BACKUP_DRIVE_FOLDER_ID",
+    "SESSION_SIGNING_KEY",
+    "PUBLIC_APP_URL",
+    "INTERNAL_APP_URL",
+    "LARGE_TRANSACTION_THRESHOLD_IDR"
+  ],
+  "integrations": ["sheets", "drive", "mail"],
+  "privilegedOperationsApproved": false,
+  "managedDeploymentDescription": "chatgpt-managed-production"
+}

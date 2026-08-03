@@ -1,0 +1,9 @@
+node_modules/
+.clasp.json
+.clasprc.json
+*oauth*client*.json
+client_secret*.json
+.apps-script-setup/
+.DS_Store
+coverage/
+*.log

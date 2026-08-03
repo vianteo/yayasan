@@ -1,0 +1,51 @@
+name: Rollback production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_number:
+        description: Positive Apps Script version number to restore
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yayasan-bina-tali-kasih-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Restore clasp credentials
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          CLASP_JSON: ${{ secrets.CLASP_JSON }}
+        run: |
+          test -n "$CLASPRC_JSON" || { echo 'CLASPRC_JSON is missing'; exit 1; }
+          test -n "$CLASP_JSON" || { echo 'CLASP_JSON is missing'; exit 1; }
+          umask 077
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          printf '%s' "$CLASP_JSON" > .clasp.json
+      - name: Restore version
+        env:
+          VERSION_NUMBER: ${{ inputs.version_number }}
+        run: npm run rollback | tee rollback-result.json
+      - name: Rollback summary
+        if: always()
+        run: |
+          echo '## Apps Script rollback' >> "$GITHUB_STEP_SUMMARY"
+          if test -f rollback-result.json; then cat rollback-result.json >> "$GITHUB_STEP_SUMMARY"; else echo 'Rollback did not produce a result.' >> "$GITHUB_STEP_SUMMARY"; fi
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Follow this rollback with a corrective pull request so source and production converge.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove credentials
+        if: always()
+        run: rm -f -- .clasp.json "$HOME/.clasprc.json"
