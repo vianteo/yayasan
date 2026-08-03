@@ -79,6 +79,118 @@ function isReferenceActive_(record) {
   return true;
 }
 
+function saveEntityWithEvidence_(entity, input, payload, user) {
+  const config = EVIDENCE_UPLOADS[entity];
+  const sheetName = ENTITY_TO_SHEET[entity];
+  if (!config || !sheetName) throw new Error('Modul ini tidak mendukung unggah file.');
+  const prepared = Object.assign({}, input || {});
+  const existing = prepared.id ? findById_(sheetName, prepared.id) : null;
+  if (prepared.id && !existing) throw new Error('Data tidak ditemukan. Muat ulang halaman dan coba lagi.');
+  if (!prepared.id) prepared.id = newId_(ENTITY_ID_PREFIX[entity] || sheetName.slice(0, 3));
+  const validated = validateEvidencePayload_(payload, config);
+  const folder = DriveApp.getFolderById(getRequiredProperty_('DOCUMENTS_DRIVE_FOLDER_ID'));
+  const fileName = buildEvidenceFileName_(entity, prepared.id, validated.mimeType, payload.name);
+  const file = folder.createFile(Utilities.newBlob(validated.bytes, validated.mimeType, fileName));
+  const fileUrl = file.getUrl();
+  try {
+    prepared[config.field] = fileUrl;
+    const saved = saveEntity_(entity, prepared, user);
+    addAudit_(entity, saved.id, existing && existing[config.field] ? 'EVIDENCE_REPLACE' : 'EVIDENCE_UPLOAD', user, {
+      field: config.field,
+      file_name: fileName,
+      mime_type: validated.mimeType,
+      size_bytes: validated.bytes.length,
+    });
+    return saved;
+  } catch (error) {
+    const persisted = findById_(sheetName, prepared.id);
+    if (!persisted || String(persisted[config.field] || '') !== fileUrl) file.setTrashed(true);
+    throw error;
+  }
+}
+
+function validateEvidencePayload_(payload, config) {
+  if (!payload || !payload.dataBase64) throw new Error('Pilih file yang akan diunggah.');
+  let bytes;
+  try {
+    bytes = Utilities.base64Decode(String(payload.dataBase64));
+  } catch (error) {
+    throw new Error('File tidak dapat dibaca. Silakan pilih file kembali.');
+  }
+  if (!bytes.length || bytes.length > MAX_EVIDENCE_FILE_BYTES) throw new Error('Ukuran file harus lebih dari 0 dan maksimal 5 MB.');
+  const detectedMime = detectEvidenceMime_(bytes);
+  if (!detectedMime || config.allowedMimes.indexOf(detectedMime) < 0) {
+    throw new Error('Format file tidak diizinkan. Gunakan JPG, PNG, atau PDF sesuai jenis bukti.');
+  }
+  if (payload.type && String(payload.type).toLowerCase() !== detectedMime) {
+    throw new Error('Isi file tidak sesuai dengan format yang dilaporkan perangkat.');
+  }
+  return {bytes: bytes, mimeType: detectedMime};
+}
+
+function detectEvidenceMime_(bytes) {
+  const value = function (index) { return ((Number(bytes[index]) || 0) + 256) % 256; };
+  if (bytes.length >= 3 && value(0) === 0xFF && value(1) === 0xD8 && value(2) === 0xFF) return 'image/jpeg';
+  if (bytes.length >= 8 && value(0) === 0x89 && value(1) === 0x50 && value(2) === 0x4E && value(3) === 0x47 && value(4) === 0x0D && value(5) === 0x0A && value(6) === 0x1A && value(7) === 0x0A) return 'image/png';
+  if (bytes.length >= 5 && value(0) === 0x25 && value(1) === 0x50 && value(2) === 0x44 && value(3) === 0x46 && value(4) === 0x2D) return 'application/pdf';
+  return '';
+}
+
+function buildEvidenceFileName_(entity, recordId, mimeType, originalName) {
+  const extension = {'image/jpeg': 'jpg', 'image/png': 'png', 'application/pdf': 'pdf'}[mimeType];
+  const originalLeaf = String(originalName || 'bukti').split(/[\\/]/).pop();
+  const originalBase = originalLeaf.replace(/\.[^.]+$/, '');
+  const baseName = originalBase.replace(/[^a-zA-Z0-9_ -]/g, '_').slice(0, 60) || 'bukti';
+  const date = Utilities.formatDate(new Date(), APP.TIME_ZONE, 'yyyyMMdd-HHmmss');
+  return date + '-' + String(entity).toUpperCase() + '-' + String(recordId) + '-' + baseName + '.' + extension;
+}
+
+function getEvidenceFile_(entity, id, user) {
+  const config = EVIDENCE_UPLOADS[entity];
+  const sheetName = ENTITY_TO_SHEET[entity];
+  if (!config || !sheetName) throw new Error('Modul bukti tidak dikenal.');
+  const record = findById_(sheetName, id);
+  if (!record) throw new Error('Data tidak ditemukan.');
+  const url = String(record[config.field] || '').trim();
+  if (!url) throw new Error('Bukti belum tersedia.');
+  const fileId = extractDriveFileId_(url);
+  if (!fileId) {
+    if (/^https:\/\//i.test(url)) return {mode: 'external', url: url};
+    throw new Error('Tautan bukti lama tidak valid.');
+  }
+  let file;
+  try {
+    file = DriveApp.getFileById(fileId);
+  } catch (error) {
+    if (/^https:\/\//i.test(url)) return {mode: 'external', url: url};
+    throw new Error('File bukti tidak ditemukan.');
+  }
+  if (!isFileInDocumentsFolder_(file)) return {mode: 'external', url: url};
+  const blob = file.getBlob();
+  const bytes = blob.getBytes();
+  if (bytes.length > MAX_EVIDENCE_FILE_BYTES) throw new Error('File terlalu besar untuk ditampilkan melalui portal.');
+  return {
+    mode: 'inline',
+    name: file.getName(),
+    mimeType: blob.getContentType(),
+    dataBase64: Utilities.base64Encode(bytes),
+  };
+}
+
+function extractDriveFileId_(url) {
+  const match = String(url || '').match(/(?:\/d\/|[?&]id=)([-\w]{20,})/);
+  return match ? match[1] : '';
+}
+
+function isFileInDocumentsFolder_(file) {
+  const folderId = getRequiredProperty_('DOCUMENTS_DRIVE_FOLDER_ID');
+  const parents = file.getParents();
+  while (parents.hasNext()) {
+    if (parents.next().getId() === folderId) return true;
+  }
+  return false;
+}
+
 function isExceptionalDisbursement_(record) {
   const threshold = Number(getRequiredProperty_('LARGE_TRANSACTION_THRESHOLD_IDR'));
   return Number(record.amount || 0) >= threshold || String(record.evidence_url || '').trim() === '' || String(record.outside_budget || '').toUpperCase() === 'TRUE';

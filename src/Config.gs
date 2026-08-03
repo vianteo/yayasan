@@ -77,6 +77,16 @@ const ENTITY_ID_PREFIX = Object.freeze({
   media: 'MED',
 });
 
+const EVIDENCE_UPLOADS = Object.freeze({
+  donations: {field: 'evidence_url', label: 'Bukti penerimaan', allowedMimes: ['image/jpeg', 'image/png', 'application/pdf']},
+  donationItems: {field: 'distribution_evidence_url', label: 'Bukti penyaluran', allowedMimes: ['image/jpeg', 'image/png', 'application/pdf']},
+  disbursements: {field: 'evidence_url', label: 'Bukti pengeluaran', allowedMimes: ['image/jpeg', 'image/png', 'application/pdf']},
+  publications: {field: 'cover_url', label: 'Gambar sampul', allowedMimes: ['image/jpeg', 'image/png']},
+  media: {field: 'file_url', label: 'File media', allowedMimes: ['image/jpeg', 'image/png', 'application/pdf']},
+});
+
+const MAX_EVIDENCE_FILE_BYTES = 5 * 1024 * 1024;
+
 const EDIT_ROLES = Object.freeze({
   programs: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],
   activities: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],

@@ -23,19 +23,19 @@ Semua otorisasi diperiksa di server. Login internal menggunakan kode sekali paka
 
 ## 4. Workflows and prioritized features
 
-V1 mencakup program/kegiatan, peserta, penerima manfaat, donasi uang/barang, pengeluaran/penyaluran, persetujuan, publikasi, laporan, audit, backup, dan pengelolaan akses pengguna oleh Admin. Semua pengeluaran disetujui ketua; transaksi besar/tidak biasa diperiksa pengawas. Publikasi dibuat sekretaris dan disetujui ketua. Form relasional menggunakan pilihan berlabel untuk program, donatur, donasi, dan publikasi; pengguna tidak perlu mengetik ID teknis.
+V1 mencakup program/kegiatan, peserta, penerima manfaat, donasi uang/barang, pengeluaran/penyaluran, persetujuan, publikasi, laporan, audit, backup, dan pengelolaan akses pengguna oleh Admin. Semua pengeluaran disetujui ketua; transaksi besar/tidak biasa diperiksa pengawas. Publikasi dibuat sekretaris dan disetujui ketua. Form relasional menggunakan pilihan berlabel untuk program, donatur, donasi, dan publikasi; pengguna tidak perlu mengetik ID teknis. Bukti penerimaan donasi, pengeluaran, penyaluran barang, dan gambar publikasi diunggah langsung melalui portal.
 
 ## 5. Entity/data model and selected store
 
-Google Sheets dipilih untuk volume awal di bawah 5.000 catatan. Entitas: users, programs, activities, participants, beneficiaries, donors, donations, donation items, disbursements, approvals, publications, media, audit log, settings, dan backup log. Data disimpan berkelanjutan dengan backup berkala. Relasi disimpan menggunakan ID stabil, tetapi UI menampilkan nama/nomor referensi beserta ID. ID dibuat otomatis dengan awalan berbeda per entitas (`PRG`, `KGT`, `PST`, `PMF`, `DNR`, `DNS`, `DBR`, `PNY`, `PUB`, `MED`) dan hanya ditampilkan sebagai informasi saat mengubah data. ID lama tetap dipertahankan.
+Google Sheets dipilih untuk volume awal di bawah 5.000 catatan. Entitas: users, programs, activities, participants, beneficiaries, donors, donations, donation items, disbursements, approvals, publications, media, audit log, settings, dan backup log. Data disimpan berkelanjutan dengan backup berkala. Relasi disimpan menggunakan ID stabil, tetapi UI menampilkan nama/nomor referensi beserta ID. ID dibuat otomatis dengan awalan berbeda per entitas (`PRG`, `KGT`, `PST`, `PMF`, `DNR`, `DNS`, `DBR`, `PNY`, `PUB`, `MED`) dan hanya ditampilkan sebagai informasi saat mengubah data. ID lama tetap dipertahankan. File bukti disimpan privat di folder Drive dokumen; Sheets hanya menyimpan URL file.
 
 ## 6. Integrations, triggers, and notifications
 
-Sheets, Drive, Mail, backup terjadwal, ringkasan bulanan, dan pengingat persetujuan. Notifikasi bersifat idempoten.
+Sheets, Drive, Mail, backup terjadwal, ringkasan bulanan, dan pengingat persetujuan. Notifikasi bersifat idempoten. Unggahan menerima JPG/PNG/PDF maksimal 5 MB; gambar sampul hanya menerima JPG/PNG. Nama file dibuat otomatis menggunakan waktu, entitas, dan ID catatan.
 
 ## 7. UI and accessibility
 
-Portal publik: beranda, profil, struktur, program, berita, galeri, laporan ringkas, donasi, kontak. Portal internal: dashboard dan modul administrasi, termasuk menu `Kelola Pengguna` khusus Admin. Form internal menampilkan dropdown relasional yang mudah dipahami, opsi kosong untuk relasi opsional, serta penjelasan bahwa ID dibuat otomatis. Bahasa Indonesia, responsif, ramah keyboard, berlabel, dan memiliki status loading/kosong/gagal/berhasil.
+Portal publik: beranda, profil, struktur, program, berita, galeri, laporan ringkas, donasi, kontak. Portal internal: dashboard dan modul administrasi, termasuk menu `Kelola Pengguna` khusus Admin. Form internal menampilkan dropdown relasional yang mudah dipahami, opsi kosong untuk relasi opsional, penjelasan bahwa ID dibuat otomatis, input unggah file, serta tombol `Lihat bukti`. File privat ditampilkan melalui respons terautentikasi tanpa membagikan folder Drive kepada pengguna. Bahasa Indonesia, responsif, ramah keyboard, berlabel, dan memiliki status loading/kosong/gagal/berhasil.
 
 ## 8. OAuth scopes and advanced services
 
@@ -47,11 +47,11 @@ Scopes eksplisit untuk Sheets, Drive, pengiriman email, dan trigger. Tidak mengg
 
 ## 10. Quota, privacy, admin, and operational risks
 
-Risiko utama: kuota email/eksekusi, konkurensi Sheets, kepemilikan akun, kebocoran data pribadi, publikasi foto anak, dan pemulihan backup. LockService, audit append-only, pembatasan akses, redaksi publik, serta backup digunakan sebagai kontrol.
+Risiko utama: kuota email/eksekusi, konkurensi Sheets, kepemilikan akun, kebocoran data pribadi, publikasi foto anak, unggahan file berbahaya/terlalu besar, kapasitas Drive, dan pemulihan backup. LockService, audit append-only, pembatasan akses, redaksi publik, validasi signature file dan ukuran, folder Drive privat, serta backup digunakan sebagai kontrol.
 
 ## 11. Testable acceptance criteria
 
-Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; mencatat seluruh keputusan; mewajibkan pengawas untuk transaksi khusus; menjaga data pribadi dari portal publik; menangani kegagalan Mail/Drive tanpa menandai proses selesai; dan mendukung pemulihan backup. Pengelolaan pengguna harus menolak email duplikat, peran/status yang tidak valid, upaya Admin menonaktifkan atau menurunkan perannya sendiri, serta perubahan yang menyebabkan tidak ada Admin aktif. Setiap perubahan pengguna dicatat pada Audit Log. Server menolak ID relasi yang tidak ditemukan atau sudah tidak aktif, tetapi tetap mengizinkan data lama mempertahankan relasi lama yang sama saat diedit. Data yang diarsipkan tidak tersedia sebagai pilihan baru.
+Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; mencatat seluruh keputusan; mewajibkan pengawas untuk transaksi khusus; menjaga data pribadi dari portal publik; menangani kegagalan Mail/Drive tanpa menandai proses selesai; dan mendukung pemulihan backup. Pengelolaan pengguna harus menolak email duplikat, peran/status yang tidak valid, upaya Admin menonaktifkan atau menurunkan perannya sendiri, serta perubahan yang menyebabkan tidak ada Admin aktif. Setiap perubahan pengguna dicatat pada Audit Log. Server menolak ID relasi yang tidak ditemukan atau sudah tidak aktif, tetapi tetap mengizinkan data lama mempertahankan relasi lama yang sama saat diedit. Data yang diarsipkan tidak tersedia sebagai pilihan baru. Unggahan menolak file kosong, lebih dari 5 MB, format terlarang, dan MIME yang tidak sesuai signature. Kegagalan penyimpanan catatan membuang file baru yang belum terhubung; unggah/penggantian dicatat di Audit Log. Tautan bukti tidak dapat diubah melalui API simpan biasa.
 
 ## 12. Manual setup and out-of-scope items
 
@@ -62,3 +62,5 @@ Disetujui oleh pengguna pada 3 Agustus 2026.
 Perubahan modul pengelolaan pengguna disetujui oleh pengguna pada 3 Agustus 2026.
 
 Perubahan dropdown relasional dan validasi referensi disetujui oleh pengguna pada 3 Agustus 2026.
+
+Perubahan unggah dan tampilan bukti melalui portal disetujui oleh pengguna pada 3 Agustus 2026.

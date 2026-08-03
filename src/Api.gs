@@ -44,7 +44,19 @@ function listEntity(token, entity) {
 
 function saveEntity(token, entity, input) {
   const user = requireUser_(token, EDIT_ROLES[entity] || []);
-  return saveEntity_(entity, input, user);
+  const safeInput = Object.assign({}, input || {});
+  const evidenceConfig = EVIDENCE_UPLOADS[entity];
+  if (evidenceConfig) delete safeInput[evidenceConfig.field];
+  return saveEntity_(entity, safeInput, user);
+}
+
+function saveEntityWithEvidence(token, entity, input, payload) {
+  const user = requireUser_(token, EDIT_ROLES[entity] || []);
+  return saveEntityWithEvidence_(entity, input, payload, user);
+}
+
+function getEvidenceFile(token, entity, id) {
+  return getEvidenceFile_(entity, id, requireUser_(token));
 }
 
 function archiveEntity(token, entity, id) {
