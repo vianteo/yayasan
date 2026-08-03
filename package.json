@@ -1,0 +1,20 @@
+{
+  "name": "yayasan-bina-tali-kasih",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplikasi web administrasi Yayasan Bina Tali Kasih",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate-project.mjs && node scripts/check-secrets.mjs",
+    "ci": "npm run validate && npm test",
+    "setup:apps-script": "bash scripts/setup-apps-script.sh",
+    "deploy": "node scripts/deploy.mjs",
+    "rollback": "node scripts/rollback.mjs"
+  },
+  "devDependencies": {
+    "@google/clasp": "3.3.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

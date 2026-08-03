@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('Styles'); ?>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke isi utama</a>
+  <header class="topbar">
+    <a class="brand" href="?page=public" aria-label="Beranda Yayasan Bina Tali Kasih">
+      <span class="brand-mark">Y</span>
+      <span><strong>Yayasan Bina Tali Kasih</strong><small>Peduli · Bertumbuh · Berdampak</small></span>
+    </a>
+    <nav aria-label="Navigasi utama">
+      <button class="nav-link" data-public-target="programs">Program</button>
+      <button class="nav-link" data-public-target="news">Kegiatan</button>
+      <button class="nav-link" data-public-target="report">Laporan</button>
+      <a class="button secondary" href="?page=internal">Portal Pengurus</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="publicApp" class="app-view">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Yayasan sosial · Deltamas, Indonesia</p>
+          <h1>Menumbuhkan harapan melalui pendidikan dan kepedulian.</h1>
+          <p class="lead">Program bahasa Inggris untuk anak kurang mampu, persiapan kerja, serta bantuan bagi panti asuhan dan masyarakat yang membutuhkan.</p>
+          <div class="actions"><button class="button primary" data-public-target="programs">Lihat program</button><button class="button ghost" data-public-target="donate">Cara berdonasi</button></div>
+        </div>
+        <div class="hero-card" aria-label="Fokus yayasan">
+          <span>01</span><h3>Pendidikan</h3><p>Bahasa Inggris dan pengembangan keterampilan.</p>
+          <span>02</span><h3>Kesiapan Kerja</h3><p>Bekal praktis bagi mahasiswa dan pencari kerja.</p>
+          <span>03</span><h3>Kepedulian Sosial</h3><p>Donasi tepat sasaran dan dapat dipertanggungjawabkan.</p>
+        </div>
+      </section>
+
+      <section class="section stats" id="publicStats" aria-live="polite"><div class="skeleton">Memuat ringkasan…</div></section>
+      <section class="section" id="programs"><p class="eyebrow">Program</p><h2>Gerakan nyata, dampak terukur.</h2><div id="programGrid" class="card-grid"><div class="skeleton">Memuat program…</div></div></section>
+      <section class="section muted" id="news"><p class="eyebrow">Kabar terbaru</p><h2>Kegiatan Yayasan</h2><div id="publicationGrid" class="card-grid"><div class="skeleton">Memuat kegiatan…</div></div></section>
+      <section class="section report-layout" id="report"><div><p class="eyebrow">Transparansi</p><h2>Ringkasan penyaluran</h2><p>Laporan publik menampilkan angka agregat tanpa mengungkap identitas donatur atau penerima manfaat.</p></div><div id="financeSummary" class="report-card"></div></section>
+      <section class="section donate" id="donate"><div><p class="eyebrow">Ambil bagian</p><h2>Berbagi melalui rekening resmi yayasan.</h2><p>Konfirmasi dan pencatatan donasi dilakukan oleh bendahara.</p></div><div id="contactCard" class="contact-card"><div class="skeleton">Memuat informasi…</div></div></section>
+    </section>
+
+    <section id="loginApp" class="app-view auth-shell" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">Portal internal</p><h1>Masuk sebagai pengurus</h1>
+        <p>Kode sekali pakai akan dikirim hanya ke email yang terdaftar.</p>
+        <form id="emailForm"><label>Email Google<input id="loginEmail" type="email" autocomplete="email" required placeholder="nama@gmail.com"></label><button class="button primary full" type="submit">Kirim kode</button></form>
+        <form id="codeForm" hidden><label>Kode 6 digit<input id="loginCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="000000"></label><button class="button primary full" type="submit">Verifikasi</button><button id="backToEmail" class="button ghost full" type="button">Ganti email</button></form>
+        <p id="authMessage" class="message" role="status"></p>
+      </div>
+    </section>
+
+    <section id="internalApp" class="app-view admin-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand inverse"><span class="brand-mark">Y</span><span><strong>YBTK</strong><small>Portal Internal</small></span></div>
+        <nav id="adminNav" aria-label="Menu dashboard"></nav>
+        <button id="logoutButton" class="button ghost inverse full">Keluar</button>
+      </aside>
+      <div class="admin-main">
+        <header class="admin-header"><div><p class="eyebrow">Dashboard</p><h1 id="pageTitle">Ringkasan</h1></div><div id="userBadge" class="user-badge"></div></header>
+        <div id="adminContent" class="admin-content" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script>window.INITIAL_PAGE = <?!= JSON.stringify(initialPage) ?>;</script>
+  <?!= include('Client'); ?>
+</body>
+</html>
