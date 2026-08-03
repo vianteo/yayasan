@@ -8,7 +8,7 @@
 <body>
   <a class="skip-link" href="#main">Lewati ke isi utama</a>
   <header class="topbar">
-    <a class="brand" href="?page=public" aria-label="Beranda Yayasan Bina Tali Kasih">
+    <a class="brand" href="<?= publicAppUrl ?>" aria-label="Beranda Yayasan Bina Tali Kasih">
       <span class="brand-mark">Y</span>
       <span><strong>Yayasan Bina Tali Kasih</strong><small>Peduli · Bertumbuh · Berdampak</small></span>
     </a>
@@ -16,7 +16,7 @@
       <button class="nav-link" data-public-target="programs">Program</button>
       <button class="nav-link" data-public-target="news">Kegiatan</button>
       <button class="nav-link" data-public-target="report">Laporan</button>
-      <a class="button secondary" href="?page=internal">Portal Pengurus</a>
+      <a class="button secondary" href="<?= internalAppUrl ?>">Portal Pengurus</a>
     </nav>
   </header>
 
@@ -57,7 +57,7 @@
       <aside class="sidebar">
         <div class="brand inverse"><span class="brand-mark">Y</span><span><strong>YBTK</strong><small>Portal Internal</small></span></div>
         <nav id="adminNav" aria-label="Menu dashboard"></nav>
-        <button id="logoutButton" class="button ghost inverse full">Keluar</button>
+        <a id="logoutButton" class="button ghost inverse full" href="<?= internalAppUrl ?>">Keluar</a>
       </aside>
       <div class="admin-main">
         <header class="admin-header"><div><p class="eyebrow">Dashboard</p><h1 id="pageTitle">Ringkasan</h1></div><div id="userBadge" class="user-badge"></div></header>
