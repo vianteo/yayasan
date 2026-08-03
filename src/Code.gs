@@ -3,7 +3,6 @@ function doGet(e) {
   template.initialPage = String((e && e.parameter && e.parameter.page) || 'public');
   return template.evaluate()
     .setTitle(APP.NAME)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.SAMEORIGIN)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
