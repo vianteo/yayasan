@@ -92,6 +92,42 @@ function saveUser(token, input) {
   return saveUser_(input, requireUser_(token, [ROLES.ADMIN]));
 }
 
+function getReferenceOptions(token) {
+  requireUser_(token);
+  const programs = readAll_('PROGRAMS');
+  const donors = readAll_('DONORS');
+  const donations = readAll_('DONATIONS');
+  const publications = readAll_('PUBLICATIONS');
+  const donorNames = donors.reduce(function (output, donor) {
+    output[donor.id] = donor.name || donor.id;
+    return output;
+  }, {});
+  return {
+    programs: buildReferenceOptions_(programs, function (program) {
+      return (program.name || 'Program tanpa nama') + ' — ' + program.id;
+    }),
+    donors: buildReferenceOptions_(donors, function (donor) {
+      return (donor.name || 'Donatur tanpa nama') + (donor.email ? ' (' + donor.email + ')' : '') + ' — ' + donor.id;
+    }),
+    donations: buildReferenceOptions_(donations, function (donation) {
+      return (donation.receipt_number || donation.id) + ' — ' + (donorNames[donation.donor_id] || 'Donatur tidak tersedia') + (donation.received_date ? ' — ' + donation.received_date : '');
+    }),
+    publications: buildReferenceOptions_(publications, function (publication) {
+      return (publication.title || 'Publikasi tanpa judul') + ' — ' + publication.id;
+    }),
+  };
+}
+
+function buildReferenceOptions_(records, labelBuilder) {
+  return records.filter(function (record) {
+    return record.id && isReferenceActive_(record);
+  }).map(function (record) {
+    return {value: String(record.id), label: String(labelBuilder(record))};
+  }).sort(function (a, b) {
+    return a.label.localeCompare(b.label, 'id');
+  });
+}
+
 function publicProgram_(record) {
   return {id: record.id, name: record.name, category: record.category, description: record.description, target: record.target, startDate: record.start_date, endDate: record.end_date, affiliated: record.affiliated === 'TRUE', affiliationLabel: record.affiliated === 'TRUE' ? APP.AFFILIATION_LABEL : ''};
 }
