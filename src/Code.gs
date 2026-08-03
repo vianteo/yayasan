@@ -1,6 +1,10 @@
 function doGet(e) {
   const template = HtmlService.createTemplateFromFile('Index');
+  const properties = PropertiesService.getScriptProperties();
+  const serviceUrl = String(ScriptApp.getService().getUrl() || '');
   template.initialPage = String((e && e.parameter && e.parameter.page) || 'public');
+  template.publicAppUrl = properties.getProperty('PUBLIC_APP_URL') || serviceUrl;
+  template.internalAppUrl = properties.getProperty('INTERNAL_APP_URL') || (serviceUrl ? serviceUrl + '?page=internal' : '');
   return template.evaluate()
     .setTitle(APP.NAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
