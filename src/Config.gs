@@ -50,6 +50,33 @@ const ENTITY_TO_SHEET = Object.freeze({
   media: 'MEDIA',
 });
 
+const ENTITY_REFERENCES = Object.freeze({
+  activities: {program_id: {sheet: 'PROGRAMS', label: 'Program', required: true}},
+  participants: {program_id: {sheet: 'PROGRAMS', label: 'Program', required: true}},
+  beneficiaries: {program_id: {sheet: 'PROGRAMS', label: 'Program', required: true}},
+  donations: {
+    donor_id: {sheet: 'DONORS', label: 'Donatur', required: true},
+    program_id: {sheet: 'PROGRAMS', label: 'Program tujuan', required: false},
+  },
+  donationItems: {donation_id: {sheet: 'DONATIONS', label: 'Donasi', required: true}},
+  disbursements: {program_id: {sheet: 'PROGRAMS', label: 'Program', required: true}},
+  publications: {program_id: {sheet: 'PROGRAMS', label: 'Program terkait', required: false}},
+  media: {publication_id: {sheet: 'PUBLICATIONS', label: 'Publikasi', required: true}},
+});
+
+const ENTITY_ID_PREFIX = Object.freeze({
+  programs: 'PRG',
+  activities: 'KGT',
+  participants: 'PST',
+  beneficiaries: 'PMF',
+  donors: 'DNR',
+  donations: 'DNS',
+  donationItems: 'DBR',
+  disbursements: 'PNY',
+  publications: 'PUB',
+  media: 'MED',
+});
+
 const EDIT_ROLES = Object.freeze({
   programs: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],
   activities: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],

@@ -29,12 +29,13 @@ function sanitizeRecord_(input) {
 function saveEntity_(entity, input, user) {
   const sheetName = ENTITY_TO_SHEET[entity];
   if (!sheetName) throw new Error('Modul tidak dikenal.');
-  validateEntity_(entity, input || {});
   const now = nowIso_();
   const clean = sanitizeRecord_(input || {});
   const existing = clean.id ? findById_(sheetName, clean.id) : null;
+  validateEntityReferences_(entity, clean, existing);
+  validateEntity_(entity, clean);
   const record = Object.assign({}, existing || {}, clean, {
-    id: clean.id || newId_(sheetName.slice(0, 3)),
+    id: clean.id || newId_(ENTITY_ID_PREFIX[entity] || sheetName.slice(0, 3)),
     created_by: existing ? existing.created_by : user.email,
     created_at: existing ? existing.created_at : now,
     updated_by: user.email,
@@ -51,6 +52,31 @@ function saveEntity_(entity, input, user) {
   const saved = upsertRecord_(sheetName, record);
   addAudit_(entity, saved.id, existing ? 'UPDATE' : 'CREATE', user, {status: saved.status});
   return saved;
+}
+
+function validateEntityReferences_(entity, input, existing) {
+  const rules = ENTITY_REFERENCES[entity] || {};
+  Object.keys(rules).forEach(function (field) {
+    const rule = rules[field];
+    const value = String(input[field] || '').trim();
+    if (!value) {
+      if (rule.required) throw new Error(rule.label + ' wajib dipilih.');
+      return;
+    }
+    const target = findById_(rule.sheet, value);
+    if (!target) throw new Error(rule.label + ' yang dipilih tidak ditemukan.');
+    const unchangedExistingReference = existing && String(existing[field] || '') === value;
+    if (!isReferenceActive_(target) && !unchangedExistingReference) {
+      throw new Error(rule.label + ' yang dipilih sudah tidak aktif atau diarsipkan.');
+    }
+  });
+}
+
+function isReferenceActive_(record) {
+  if (!record) return false;
+  if (String(record.status || '').toUpperCase() === 'ARCHIVED') return false;
+  if (String(record.active || '').toUpperCase() === 'FALSE') return false;
+  return true;
 }
 
 function isExceptionalDisbursement_(record) {
