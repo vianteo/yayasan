@@ -5,10 +5,12 @@
   "description": "Aplikasi web administrasi Yayasan Bina Tali Kasih",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "validate": "node scripts/validate-project.mjs && node scripts/check-secrets.mjs",
+    "validate": "node scripts/validate-project.mjs && node scripts/validate-firebase-hosting.mjs && node scripts/check-secrets.mjs",
     "ci": "npm run validate && npm test",
     "setup:apps-script": "bash scripts/setup-apps-script.sh",
+    "setup:firebase-hosting": "bash scripts/setup-firebase-hosting.sh",
     "deploy": "node scripts/deploy.mjs",
+    "deploy:hosting": "node scripts/deploy-firebase-hosting.mjs",
     "rollback": "node scripts/rollback.mjs"
   },
   "devDependencies": {

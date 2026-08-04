@@ -1,0 +1,24 @@
+{
+  "hosting": {
+    "public": "hosting",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/pengurus{,/**}",
+        "destination": "https://script.google.com/macros/s/AKfycbzRFKuvhPtOrnUNvCI5iU415ki-RfH2kF9O_VMXrR3Obd5kXqYUp-YCe2Aizx0wbebI/exec?page=internal",
+        "type": 302
+      },
+      {
+        "source": "/",
+        "destination": "https://script.google.com/macros/s/AKfycbzRFKuvhPtOrnUNvCI5iU415ki-RfH2kF9O_VMXrR3Obd5kXqYUp-YCe2Aizx0wbebI/exec",
+        "type": 302
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  }
+}
