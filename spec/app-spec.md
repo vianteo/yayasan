@@ -6,7 +6,7 @@ Menyatukan administrasi program, peserta/penerima manfaat, donasi, penyaluran, b
 
 ## 2. Project type and architecture
 
-Web app baru menggunakan Google Apps Script V8, HTML Service, Google Sheets, Google Drive, dan email. Satu proyek menyediakan portal publik dan portal internal terautentikasi.
+Web app menggunakan Google Apps Script V8, HTML Service, Google Sheets, Google Drive, dan email. Satu proyek menyediakan portal publik dan portal internal terautentikasi. Firebase Hosting menyediakan URL masuk gratis `PROJECT_ID.web.app` melalui redirect HTTPS; Apps Script tetap menjadi runtime aplikasi dan alamat browser berpindah ke domain Apps Script setelah redirect.
 
 ## 3. Roles and access control
 
@@ -32,7 +32,7 @@ Google Sheets dipilih untuk volume awal di bawah 5.000 catatan. Entitas: users, 
 
 ## 6. Integrations, triggers, and notifications
 
-Sheets, Drive, Mail, backup terjadwal, ringkasan bulanan, dan pengingat persetujuan. Notifikasi bersifat idempoten. Unggahan menerima JPG/PNG/PDF maksimal 5 MB; gambar sampul hanya menerima JPG/PNG. Nama file dibuat otomatis menggunakan waktu, entitas, dan ID catatan.
+Sheets, Drive, Mail, Firebase Hosting, backup terjadwal, ringkasan bulanan, dan pengingat persetujuan. Notifikasi bersifat idempoten. Unggahan menerima JPG/PNG/PDF maksimal 5 MB; gambar sampul hanya menerima JPG/PNG. Nama file dibuat otomatis menggunakan waktu, entitas, dan ID catatan. Rute Firebase `/` mengarah ke portal publik, sedangkan `/pengurus` mengarah ke portal internal.
 
 ## 7. UI and accessibility
 
@@ -48,7 +48,7 @@ Scopes eksplisit untuk Sheets, Drive, pengiriman email, dan trigger. Tidak mengg
 
 ## 10. Quota, privacy, admin, and operational risks
 
-Risiko utama: kuota email/eksekusi, konkurensi Sheets, kepemilikan akun, kebocoran data pribadi, publikasi foto anak, unggahan file berbahaya/terlalu besar, kapasitas Drive, dan pemulihan backup. LockService, audit append-only, pembatasan akses, redaksi publik, validasi signature file dan ukuran, folder Drive privat, serta backup digunakan sebagai kontrol.
+Risiko utama: kuota email/eksekusi, konkurensi Sheets, kepemilikan akun, kebocoran data pribadi, publikasi foto anak, unggahan file berbahaya/terlalu besar, kapasitas Drive, pemulihan backup, serta nama proyek Firebase yang bersifat unik global. LockService, audit append-only, pembatasan akses, redaksi publik, validasi signature file dan ukuran, folder Drive privat, backup, dan redirect sementara HTTP 302 digunakan sebagai kontrol. Hosting tidak memakai iframe sehingga Apps Script tidak perlu membuka perlindungan `X-Frame-Options`.
 
 ## 11. Testable acceptance criteria
 
@@ -56,7 +56,7 @@ Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; menc
 
 ## 12. Manual setup and out-of-scope items
 
-Manual: akun pemilik, Sheets/folder Drive, pengguna Admin pertama, batas transaksi, rekening/kontak resmi, Script Properties, OAuth, branding, dan penyesuaian AD/ART. Pengguna berikutnya dan penugasan Staf Program dikelola melalui portal oleh Admin. Sheet `USER_PROGRAM_ACCESS` dan `PROGRAM_CHANGE_REQUESTS` dibuat otomatis saat fitur pertama kali dipakai; tidak ada Script Property atau OAuth scope baru. Di luar V1: payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/akuntansi gaji, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
+Manual: akun pemilik, Sheets/folder Drive, pengguna Admin pertama, batas transaksi, rekening/kontak resmi, Script Properties, OAuth, branding, penyesuaian AD/ART, login Firebase CLI satu kali, dan deployment Hosting pertama. Pengguna berikutnya dan penugasan Staf Program dikelola melalui portal oleh Admin. Sheet `USER_PROGRAM_ACCESS` dan `PROGRAM_CHANGE_REQUESTS` dibuat otomatis saat fitur pertama kali dipakai; tidak ada Script Property atau OAuth scope baru. Nilai `PUBLIC_APP_URL` dan `INTERNAL_APP_URL` diperbarui ke URL Firebase setelah Hosting aktif. Di luar V1: custom domain berbayar, reverse proxy Firebase ke Apps Script, iframe portal, payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/akuntansi gaji, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
 
 Disetujui oleh pengguna pada 3 Agustus 2026.
 
@@ -67,3 +67,5 @@ Perubahan dropdown relasional dan validasi referensi disetujui oleh pengguna pad
 Perubahan unggah dan tampilan bukti melalui portal disetujui oleh pengguna pada 3 Agustus 2026.
 
 Perubahan akses Staf Program berbasis penugasan Program disetujui oleh pengguna pada 4 Agustus 2026.
+
+Perubahan URL masuk gratis menggunakan redirect Firebase Hosting disetujui oleh pengguna pada 4 Agustus 2026.

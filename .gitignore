@@ -4,6 +4,10 @@ node_modules/
 *oauth*client*.json
 client_secret*.json
 .apps-script-setup/
+.firebase/
+.firebase-cli/
+.firebaserc
+firebase-debug.log
 .DS_Store
 coverage/
 *.log
