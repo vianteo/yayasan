@@ -32,6 +32,7 @@ function saveEntity_(entity, input, user) {
   const now = nowIso_();
   const clean = sanitizeRecord_(input || {});
   const existing = clean.id ? findById_(sheetName, clean.id) : null;
+  assertStaffCanWriteEntity_(entity, clean, existing, user);
   validateEntityReferences_(entity, clean, existing);
   validateEntity_(entity, clean);
   const record = Object.assign({}, existing || {}, clean, {
@@ -151,6 +152,7 @@ function getEvidenceFile_(entity, id, user) {
   if (!config || !sheetName) throw new Error('Modul bukti tidak dikenal.');
   const record = findById_(sheetName, id);
   if (!record) throw new Error('Data tidak ditemukan.');
+  assertStaffCanReadEntity_(entity, record, user);
   const url = String(record[config.field] || '').trim();
   if (!url) throw new Error('Bukti belum tersedia.');
   const fileId = extractDriveFileId_(url);

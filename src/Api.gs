@@ -19,27 +19,34 @@ function getPublicData() {
 
 function getInternalBootstrap(token) {
   const user = requireUser_(token);
-  const disbursements = readAll_('DISBURSEMENTS');
+  const isStaff = user.role === ROLES.STAF_PROGRAM;
+  const programs = filterEntityRecordsForUser_('programs', readAll_('PROGRAMS'), user);
+  const participants = filterEntityRecordsForUser_('participants', readAll_('PARTICIPANTS'), user);
+  const beneficiaries = filterEntityRecordsForUser_('beneficiaries', readAll_('BENEFICIARIES'), user);
+  const disbursements = isStaff ? [] : readAll_('DISBURSEMENTS');
   return {
     user: safeUser_(user),
+    editableProgramIds: isStaff ? getAssignedProgramIds_(user, 'EDIT') : [],
     counts: {
-      programs: readAll_('PROGRAMS').length,
-      participants: readAll_('PARTICIPANTS').length,
-      beneficiaries: readAll_('BENEFICIARIES').length,
-      donors: readAll_('DONORS').length,
+      programs: programs.length,
+      participants: participants.length,
+      beneficiaries: beneficiaries.length,
+      donors: isStaff ? 0 : readAll_('DONORS').length,
       pendingChair: disbursements.filter(function (item) { return item.status === 'PENDING_CHAIR'; }).length,
       pendingSupervisor: disbursements.filter(function (item) { return item.status === 'PENDING_SUPERVISOR'; }).length,
     },
-    permissions: Object.keys(EDIT_ROLES).filter(function (entity) { return EDIT_ROLES[entity].indexOf(user.role) >= 0; }),
+    permissions: Object.keys(EDIT_ROLES).filter(function (entity) {
+      return EDIT_ROLES[entity].indexOf(user.role) >= 0 && (!isStaff || STAFF_EDIT_ENTITIES.indexOf(entity) >= 0);
+    }),
     health: healthCheck(),
   };
 }
 
 function listEntity(token, entity) {
-  requireUser_(token);
+  const user = requireUser_(token);
   const sheetName = ENTITY_TO_SHEET[entity];
   if (!sheetName) throw new Error('Modul tidak dikenal.');
-  return readAll_(sheetName).slice().reverse().slice(0, 500);
+  return filterEntityRecordsForUser_(entity, readAll_(sheetName), user).slice().reverse().slice(0, 500);
 }
 
 function saveEntity(token, entity, input) {
@@ -61,6 +68,7 @@ function getEvidenceFile(token, entity, id) {
 
 function archiveEntity(token, entity, id) {
   const user = requireUser_(token, EDIT_ROLES[entity] || []);
+  if (user.role === ROLES.STAF_PROGRAM) throw new Error('Staf Program tidak dapat mengarsipkan data.');
   const sheetName = ENTITY_TO_SHEET[entity];
   const record = findById_(sheetName, id);
   if (!record) throw new Error('Data tidak ditemukan.');
@@ -104,12 +112,36 @@ function saveUser(token, input) {
   return saveUser_(input, requireUser_(token, [ROLES.ADMIN]));
 }
 
+function listProgramAccess(token) {
+  return listProgramAccess_(requireUser_(token, [ROLES.ADMIN]));
+}
+
+function saveProgramAccess(token, input) {
+  return saveProgramAccess_(input, requireUser_(token, [ROLES.ADMIN]));
+}
+
+function listProgramChangeRequests(token) {
+  return listProgramChangeRequests_(requireUser_(token));
+}
+
+function saveProgramChangeRequest(token, input) {
+  return saveProgramChangeRequest_(input, requireUser_(token, [ROLES.STAF_PROGRAM]));
+}
+
+function decideProgramChangeRequest(token, id, decision, reviewNotes) {
+  return decideProgramChangeRequest_(id, decision, reviewNotes, requireUser_(token, [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN]));
+}
+
 function getReferenceOptions(token) {
-  requireUser_(token);
-  const programs = readAll_('PROGRAMS');
-  const donors = readAll_('DONORS');
-  const donations = readAll_('DONATIONS');
-  const publications = readAll_('PUBLICATIONS');
+  const user = requireUser_(token);
+  const isStaff = user.role === ROLES.STAF_PROGRAM;
+  const editableProgramIds = isStaff ? getAssignedProgramIds_(user, 'EDIT') : [];
+  const programs = readAll_('PROGRAMS').filter(function (program) {
+    return !isStaff || editableProgramIds.indexOf(String(program.id)) >= 0;
+  });
+  const donors = isStaff ? [] : readAll_('DONORS');
+  const donations = isStaff ? [] : readAll_('DONATIONS');
+  const publications = isStaff ? filterEntityRecordsForUser_('publications', readAll_('PUBLICATIONS'), user) : readAll_('PUBLICATIONS');
   const donorNames = donors.reduce(function (output, donor) {
     output[donor.id] = donor.name || donor.id;
     return output;

@@ -15,6 +15,7 @@ const ROLES = Object.freeze({
   WAKIL_KETUA: 'WAKIL_KETUA',
   SEKRETARIS: 'SEKRETARIS',
   BENDAHARA: 'BENDAHARA',
+  STAF_PROGRAM: 'STAF_PROGRAM',
   ADMIN: 'ADMIN',
 });
 
@@ -35,6 +36,8 @@ const SHEETS = Object.freeze({
   SETTINGS: ['key', 'value', 'description', 'updated_by', 'updated_at'],
   BACKUP_LOG: ['id', 'file_id', 'file_name', 'status', 'notes', 'created_at'],
   NOTIFICATIONS: ['id', 'event_key', 'recipient', 'subject', 'status', 'attempts', 'last_error', 'sent_at', 'created_at'],
+  USER_PROGRAM_ACCESS: ['id', 'user_id', 'program_id', 'access_level', 'active', 'start_date', 'end_date', 'created_by', 'created_at', 'updated_by', 'updated_at'],
+  PROGRAM_CHANGE_REQUESTS: ['id', 'program_id', 'requested_by', 'fields_json', 'notes', 'status', 'reviewed_by', 'reviewed_at', 'review_notes', 'created_at', 'updated_at'],
 });
 
 const ENTITY_TO_SHEET = Object.freeze({
@@ -87,16 +90,28 @@ const EVIDENCE_UPLOADS = Object.freeze({
 
 const MAX_EVIDENCE_FILE_BYTES = 5 * 1024 * 1024;
 
+const STAFF_VISIBLE_ENTITIES = Object.freeze(['programs', 'activities', 'participants', 'beneficiaries', 'publications']);
+const STAFF_EDIT_ENTITIES = Object.freeze(['activities', 'participants', 'beneficiaries', 'publications']);
+const PROGRAM_SCOPED_ENTITIES = Object.freeze({
+  programs: 'id',
+  activities: 'program_id',
+  participants: 'program_id',
+  beneficiaries: 'program_id',
+  publications: 'program_id',
+});
+
+const PROGRAM_CHANGE_FIELDS = Object.freeze(['name', 'category', 'description', 'target', 'start_date', 'end_date', 'budget', 'pic', 'affiliated']);
+
 const EDIT_ROLES = Object.freeze({
   programs: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],
-  activities: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.ADMIN],
-  participants: [ROLES.SEKRETARIS, ROLES.ADMIN],
-  beneficiaries: [ROLES.SEKRETARIS, ROLES.ADMIN],
+  activities: [ROLES.SEKRETARIS, ROLES.KETUA, ROLES.STAF_PROGRAM, ROLES.ADMIN],
+  participants: [ROLES.SEKRETARIS, ROLES.STAF_PROGRAM, ROLES.ADMIN],
+  beneficiaries: [ROLES.SEKRETARIS, ROLES.STAF_PROGRAM, ROLES.ADMIN],
   donors: [ROLES.BENDAHARA, ROLES.ADMIN],
   donations: [ROLES.BENDAHARA, ROLES.ADMIN],
   donationItems: [ROLES.BENDAHARA, ROLES.ADMIN],
   disbursements: [ROLES.BENDAHARA, ROLES.ADMIN],
-  publications: [ROLES.SEKRETARIS, ROLES.ADMIN],
+  publications: [ROLES.SEKRETARIS, ROLES.STAF_PROGRAM, ROLES.ADMIN],
   media: [ROLES.SEKRETARIS, ROLES.ADMIN],
 });
 
