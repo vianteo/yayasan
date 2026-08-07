@@ -5,6 +5,11 @@ function doGet(e) {
   template.initialPage = String((e && e.parameter && e.parameter.page) || 'public');
   template.publicAppUrl = properties.getProperty('PUBLIC_APP_URL') || serviceUrl;
   template.internalAppUrl = properties.getProperty('INTERNAL_APP_URL') || (serviceUrl ? serviceUrl + '?page=internal' : '');
+  template.officialContact = {
+    OFFICIAL_BANK_NAME: OFFICIAL_BANK.NAME,
+    OFFICIAL_BANK_ACCOUNT_NAME: OFFICIAL_BANK.ACCOUNT_NAME,
+    OFFICIAL_BANK_ACCOUNT_NUMBER: OFFICIAL_BANK.ACCOUNT_NUMBER,
+  };
   return template.evaluate()
     .setTitle(APP.NAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');

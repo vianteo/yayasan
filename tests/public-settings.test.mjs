@@ -8,6 +8,7 @@ import {fileURLToPath} from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const configSource = fs.readFileSync(path.join(root, 'src/Config.gs'), 'utf8');
 const apiSource = fs.readFileSync(path.join(root, 'src/Api.gs'), 'utf8');
+const codeSource = fs.readFileSync(path.join(root, 'src/Code.gs'), 'utf8');
 const indexSource = fs.readFileSync(path.join(root, 'src/Index.html'), 'utf8');
 const clientSource = fs.readFileSync(path.join(root, 'src/Client.html'), 'utf8');
 
@@ -47,8 +48,13 @@ test('nilai SETTINGS nonkosong tetap memprioritaskan konfigurasi pengurus', () =
 
 test('halaman donasi tetap terhubung ke data rekening publik', () => {
   assert.match(indexSource, /id="contactCard"/);
+  assert.match(indexSource, /officialContact\.OFFICIAL_BANK_ACCOUNT_NUMBER/);
+  assert.match(indexSource, /window\.OFFICIAL_CONTACT/);
   assert.match(indexSource, /<\?!= include\('Client'\); \?>/);
   assert.match(indexSource, /Konfirmasi donasi ke email: binatalikasih@gmail\.com/);
+  assert.match(codeSource, /template\.officialContact/);
+  assert.match(codeSource, /OFFICIAL_BANK_ACCOUNT_NUMBER: OFFICIAL_BANK\.ACCOUNT_NUMBER/);
   assert.match(clientSource, /OFFICIAL_BANK_ACCOUNT_NUMBER/);
+  assert.match(clientSource, /Object\.assign\(\{\},window\.OFFICIAL_CONTACT\|\|\{\},data\.contact\|\|\{\}\)/);
   assert.match(clientSource, /getElementById\('contactCard'\)/);
 });
