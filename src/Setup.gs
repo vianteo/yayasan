@@ -25,9 +25,9 @@ function seedSettings_() {
   const existing = readAll_('SETTINGS').map(function (item) { return item.key; });
   const defaults = [
     ['ORGANIZATION_NAME', APP.NAME, 'Nama yayasan'],
-    ['OFFICIAL_BANK_NAME', '', 'Nama bank resmi'],
-    ['OFFICIAL_BANK_ACCOUNT_NAME', '', 'Nama pemilik rekening resmi'],
-    ['OFFICIAL_BANK_ACCOUNT_NUMBER', '', 'Nomor rekening resmi'],
+    ['OFFICIAL_BANK_NAME', OFFICIAL_BANK.NAME, 'Nama bank resmi'],
+    ['OFFICIAL_BANK_ACCOUNT_NAME', OFFICIAL_BANK.ACCOUNT_NAME, 'Nama pemilik rekening resmi'],
+    ['OFFICIAL_BANK_ACCOUNT_NUMBER', OFFICIAL_BANK.ACCOUNT_NUMBER, 'Nomor rekening resmi'],
     ['PUBLIC_EMAIL', '', 'Email publik'],
     ['PUBLIC_PHONE', '', 'Nomor kontak publik'],
     ['PUBLIC_ADDRESS', '', 'Alamat publik'],

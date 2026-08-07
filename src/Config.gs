@@ -8,6 +8,12 @@ const APP = Object.freeze({
   AFFILIATION_LABEL: 'Berkolaborasi dengan GPdI Pniel Deltamas',
 });
 
+const OFFICIAL_BANK = Object.freeze({
+  NAME: 'BRI',
+  ACCOUNT_NAME: 'Yayasan Bina Tali Kasih',
+  ACCOUNT_NUMBER: '227501001296562',
+});
+
 const ROLES = Object.freeze({
   PEMBINA: 'PEMBINA',
   PENGAWAS: 'PENGAWAS',

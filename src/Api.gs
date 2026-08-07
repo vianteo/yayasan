@@ -182,5 +182,16 @@ function publicPublication_(record) {
 
 function getPublicSettings_() {
   const allowed = ['OFFICIAL_BANK_NAME', 'OFFICIAL_BANK_ACCOUNT_NAME', 'OFFICIAL_BANK_ACCOUNT_NUMBER', 'PUBLIC_EMAIL', 'PUBLIC_PHONE', 'PUBLIC_ADDRESS'];
-  return readAll_('SETTINGS').filter(function (item) { return allowed.indexOf(item.key) >= 0; }).reduce(function (output, item) { output[item.key] = item.value; return output; }, {});
+  const output = {
+    OFFICIAL_BANK_NAME: OFFICIAL_BANK.NAME,
+    OFFICIAL_BANK_ACCOUNT_NAME: OFFICIAL_BANK.ACCOUNT_NAME,
+    OFFICIAL_BANK_ACCOUNT_NUMBER: OFFICIAL_BANK.ACCOUNT_NUMBER,
+  };
+  return readAll_('SETTINGS').filter(function (item) {
+    return allowed.indexOf(item.key) >= 0;
+  }).reduce(function (settings, item) {
+    const value = String(item.value || '').trim();
+    if (value) settings[item.key] = value;
+    return settings;
+  }, output);
 }
