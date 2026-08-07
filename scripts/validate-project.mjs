@@ -17,6 +17,7 @@ if(config.schemaVersion!==1)fail('app.config.json schemaVersion must be 1');
 if(!['webapp','automation','bound-script','workspace-addon'].includes(config.projectType))fail('Invalid projectType');
 if(!['none','sheets','properties','cloud-sql','firestore-rest','bigquery','external-rest'].includes(config.dataStore))fail('Invalid dataStore');
 if(config.projectType==='webapp'&&config.deploymentMode!=='versioned')fail('Web apps require versioned deployment');
+if(config.managedDeploymentId&&!/^AKfycb[A-Za-z0-9_-]+$/.test(config.managedDeploymentId))fail('Invalid managedDeploymentId');
 if(!config.requiredScriptProperties.every(name=>/^[A-Z][A-Z0-9_]*$/.test(name)))fail('Script Property names must use UPPER_SNAKE_CASE');
 if(config.privilegedOperationsApproved!==false)fail('Privileged operations are not approved');
 if(manifest.runtimeVersion!=='V8')fail('Apps Script V8 is required');

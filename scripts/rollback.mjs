@@ -13,7 +13,10 @@ const run=(args,options={})=>execFileSync(clasp,args,{cwd:root,encoding:'utf8',s
 if(run(['--version'],{capture:true}).trim()!=='3.3.0')throw new Error('Expected clasp 3.3.0');
 const parsed=JSON.parse(run(['--json','list-deployments'],{capture:true}));
 const deployments=Array.isArray(parsed)?parsed:(parsed.deployments||[]);
-const existing=deployments.find(item=>String(item.description||'').startsWith(config.managedDeploymentDescription));
+const configuredId=String(config.managedDeploymentId||'').trim();
+const existing=configuredId
+  ? deployments.find(item=>String(item.deploymentId||item.id||'')===configuredId)
+  : deployments.find(item=>String(item.description||'').startsWith(config.managedDeploymentDescription));
 if(!existing)throw new Error('Managed deployment not found');
 const id=existing.deploymentId||existing.id;
 run(['--json','update-deployment',id,'--versionNumber',String(version),'--description',`${config.managedDeploymentDescription} rollback-v${version}`]);

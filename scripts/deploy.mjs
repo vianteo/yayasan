@@ -15,7 +15,11 @@ const marker=config.managedDeploymentDescription;
 const raw=run(['--json','list-deployments'],{capture:true});
 const parsed=JSON.parse(raw);
 const deployments=Array.isArray(parsed)?parsed:(parsed.deployments||[]);
-const existing=deployments.find(item=>String(item.description||'').startsWith(marker));
+const configuredId=String(config.managedDeploymentId||'').trim();
+const existing=configuredId
+  ? deployments.find(item=>String(item.deploymentId||item.id||'')===configuredId)
+  : deployments.find(item=>String(item.description||'').startsWith(marker));
+if(configuredId&&!existing)throw new Error('Configured managed deployment was not found');
 const commit=process.env.GITHUB_SHA||'manual';
 const webUrl=item=>(item?.entryPoints||[]).find(entry=>entry.entryPointType==='WEB_APP')?.webApp?.url||'';
 if(existing){const id=existing.deploymentId||existing.id;const result=JSON.parse(run(['--json','update-deployment',id,'--description',`${marker} ${commit}`],{capture:true}));console.log(JSON.stringify({action:'updated',deploymentId:id,url:webUrl(result)||webUrl(existing)}));}
