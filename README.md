@@ -11,7 +11,15 @@ Aplikasi web administrasi Yayasan Bina Tali Kasih berbasis Google Apps Script. A
 - Firebase Hosting sebagai URL masuk gratis melalui redirect HTTPS
 - GitHub Actions + clasp untuk deployment berversi
 
-Data, ID Google Drive/Sheets, rekening, dan kredensial tidak disimpan dalam repository.
+Data operasional, ID Google Drive/Sheets, dan kredensial tidak disimpan dalam repository. Informasi rekening resmi yang memang ditujukan untuk publik disediakan sebagai konfigurasi bawaan dan tetap dapat diganti melalui sheet `SETTINGS`.
+
+## Rekening donasi resmi
+
+- Bank: BRI
+- Nama rekening: Yayasan Bina Tali Kasih
+- Nomor rekening: `227501001296562`
+
+Portal publik memakai informasi di atas ketika pengaturan rekening pada sheet `SETTINGS` masih kosong. Nilai nonkosong pada sheet tetap diprioritaskan.
 
 ## Pengembangan
 

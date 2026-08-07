@@ -56,7 +56,7 @@ Sistem menolak input tidak valid dan akses salah peran; mencegah duplikasi; menc
 
 ## 12. Manual setup and out-of-scope items
 
-Manual: akun pemilik, Sheets/folder Drive, pengguna Admin pertama, batas transaksi, rekening/kontak resmi, Script Properties, OAuth, branding, penyesuaian AD/ART, login Firebase CLI satu kali, dan deployment Hosting pertama. Pengguna berikutnya dan penugasan Staf Program dikelola melalui portal oleh Admin. Sheet `USER_PROGRAM_ACCESS` dan `PROGRAM_CHANGE_REQUESTS` dibuat otomatis saat fitur pertama kali dipakai; tidak ada Script Property atau OAuth scope baru. Nilai `PUBLIC_APP_URL` dan `INTERNAL_APP_URL` diperbarui ke URL Firebase setelah Hosting aktif. Di luar V1: custom domain berbayar, reverse proxy Firebase ke Apps Script, iframe portal, payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/akuntansi gaji, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
+Manual: akun pemilik, Sheets/folder Drive, pengguna Admin pertama, batas transaksi, kontak resmi, Script Properties, OAuth, branding, penyesuaian AD/ART, login Firebase CLI satu kali, dan deployment Hosting pertama. Rekening donasi resmi bawaan adalah BRI nomor `227501001296562` atas nama Yayasan Bina Tali Kasih; nilai nonkosong pada sheet `SETTINGS` tetap dapat menggantinya. Pengguna berikutnya dan penugasan Staf Program dikelola melalui portal oleh Admin. Sheet `USER_PROGRAM_ACCESS` dan `PROGRAM_CHANGE_REQUESTS` dibuat otomatis saat fitur pertama kali dipakai; tidak ada Script Property atau OAuth scope baru. Nilai `PUBLIC_APP_URL` dan `INTERNAL_APP_URL` diperbarui ke URL Firebase setelah Hosting aktif. Di luar V1: custom domain berbayar, reverse proxy Firebase ke Apps Script, iframe portal, payment gateway, formulir publik, portal donatur, WhatsApp API, payroll/akuntansi gaji, akuntansi bank, aplikasi seluler, multi-yayasan, dan Marketplace.
 
 Disetujui oleh pengguna pada 3 Agustus 2026.
 
@@ -69,3 +69,5 @@ Perubahan unggah dan tampilan bukti melalui portal disetujui oleh pengguna pada 
 Perubahan akses Staf Program berbasis penugasan Program disetujui oleh pengguna pada 4 Agustus 2026.
 
 Perubahan URL masuk gratis menggunakan redirect Firebase Hosting disetujui oleh pengguna pada 4 Agustus 2026.
+
+Penambahan rekening donasi resmi BRI disetujui oleh pengguna pada 7 Agustus 2026.
