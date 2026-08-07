@@ -15,5 +15,6 @@
   ],
   "integrations": ["sheets", "drive", "mail", "firebase-hosting"],
   "privilegedOperationsApproved": false,
+  "managedDeploymentId": "AKfycbzRFKuvhPtOrnUNvCI5iU415ki-RfH2kF9O_VMXrR3Obd5kXqYUp-YCe2Aizx0wbebI",
   "managedDeploymentDescription": "chatgpt-managed-production"
 }
